@@ -255,6 +255,7 @@ void updateGamelist(SystemData* system)
 						break;
 					}
 				}
+			}
 
 			// it was either removed or never existed to begin with; either way, we can add it now
 			addFileDataNode(root, *fit, tag, system);
