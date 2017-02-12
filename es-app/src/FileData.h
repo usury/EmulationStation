@@ -41,7 +41,8 @@ public:
 	inline const boost::filesystem::path& getPath() const { return mPath; }
 	inline FileData* getParent() const { return mParent; }
 	inline const std::unordered_map<std::string, FileData*>& getChildrenByFilename() const { return mChildrenByFilename; }
-	inline const std::vector<FileData*>& getChildren() const { return mChildren; }
+	//**dfd** function prototype replaced (below) for "KidMode" functionality
+	//inline const std::vector<FileData*>& getChildren() const { return mChildren; }
 	inline SystemData* getSystem() const { return mSystem; }
 	
 	virtual const std::string& getThumbnailPath() const;

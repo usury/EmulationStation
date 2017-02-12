@@ -227,6 +227,9 @@ void FileData::sort(ComparisonFunction& comparator, bool ascending)
 
 	for(auto it = mChildren.begin(); it != mChildren.end(); it++)
 	{
+		//**dfd** TODO Is this a problem for KidMode
+		//"getChildren() expects an argument called "filter"
+		// - though perhaps this is a different "getChildren()" method??
 		if((*it)->getChildren().size() > 0)
 			(*it)->sort(comparator, ascending);
 	}
