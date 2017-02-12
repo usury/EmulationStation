@@ -43,7 +43,6 @@ FILE * __iob_func(void)
 	return iob;
 }
 #endif
-#endif
 
 Eigen::Affine3f& roundMatrix(Eigen::Affine3f& mat)
 {
