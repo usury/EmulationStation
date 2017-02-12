@@ -23,6 +23,8 @@ public:
 	void reloadGameListView(IGameListView* gamelist, bool reloadTheme = false);
 	inline void reloadGameListView(SystemData* system, bool reloadTheme = false) { reloadGameListView(getGameListView(system).get(), reloadTheme); }
 	void reloadAll(); // Reload everything with a theme.  Used when the "ThemeSet" setting changes.
+	void setInvalidGamesList(SystemData* system);
+	void setAllInvalidGamesList(SystemData* systemExclude);
 
 	// Navigation.
 	void goToNextGameList();
@@ -30,9 +32,14 @@ public:
 	void goToGameList(SystemData* system);
 	void goToSystemView(SystemData* system);
 	void goToStart();
+	void goToRandomGame();
 
 	void onFileChanged(FileData* file, FileChangeType change);
 
+	//void updateFavorite(SystemData* system, FileData* file);
+	//void updateKidGame(SystemData* system, FileData* file);
+	void updateView(SystemData* system, FileData* file);
+	
 	// Plays a nice launch effect and launches the game at the end of it.
 	// Once the game terminates, plays a return effect.
 	void launch(FileData* game, Eigen::Vector3f centerCameraOn = Eigen::Vector3f(Renderer::getScreenWidth() / 2.0f, Renderer::getScreenHeight() / 2.0f, 0));
@@ -78,10 +85,14 @@ private:
 	std::shared_ptr<GuiComponent> mCurrentView;
 	std::map< SystemData*, std::shared_ptr<IGameListView> > mGameListViews;
 	std::shared_ptr<SystemView> mSystemListView;
+
+	std::map<SystemData*, bool> mInvalidGameList;
 	
 	Eigen::Affine3f mCamera;
 	float mFadeOpacity;
 	bool mLockInput;
+	bool mFavoritesOnly;
+	bool mKidGamesOnly;
 
 	State mState;
 };

@@ -48,8 +48,11 @@ public:
 	virtual const std::string& getVideoPath() const;
 	virtual const std::string& getMarqueePath() const;
 
-	std::vector<FileData*> getFilesRecursive(unsigned int typeMask) const;
-
+	std::vector<FileData*> getChildren(bool filter = false) const;
+	std::vector<FileData*> getFilesRecursive(unsigned int typeMask, bool filter) const;
+	std::vector<FileData*> filterFileData(std::vector<FileData*> in, std::string filtername, std::string passString) const;
+	FileData* getRandom() const;
+	
 	void addChild(FileData* file); // Error if mType != FOLDER
 	void removeChild(FileData* file); //Error if mType != FOLDER
 

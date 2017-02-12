@@ -24,14 +24,17 @@ SystemView::SystemView(Window* window) : IList<SystemViewData, SystemData*>(wind
 
 	mSystemInfo.setSize(mSize.x(), mSystemInfo.getSize().y() * 1.333f);
 	mSystemInfo.setPosition(0, (mSize.y() + BAND_HEIGHT) / 2);
-
+		
 	populate();
 }
 
 void SystemView::populate()
 {
+	LOG(LogDebug) << "SystemView::populate()";
+	LOG(LogDebug) << "    Settings.UIMode  = " << Settings::getInstance()->getString("UIMode");
+	LOG(LogDebug) << "    Settings.FavoritesOnly  = " << Settings::getInstance()->getBool("FavoritesOnly");
+	
 	mEntries.clear();
-
 	for(auto it = SystemData::sSystemVector.begin(); it != SystemData::sSystemVector.end(); it++)
 	{
 		const std::shared_ptr<ThemeData>& theme = (*it)->getTheme();
@@ -73,12 +76,6 @@ void SystemView::populate()
 			textSelected->setSize(logoSize());
 			e.data.logoSelected = std::shared_ptr<GuiComponent>(textSelected);
 		}
-
-		// make background extras
-		e.data.backgroundExtras = std::shared_ptr<ThemeExtras>(new ThemeExtras(mWindow));
-		e.data.backgroundExtras->setExtras(ThemeData::makeExtras((*it)->getTheme(), "system", mWindow));
-
-		this->add(e);
 	}
 }
 
@@ -96,7 +93,7 @@ bool SystemView::input(InputConfig* config, Input input)
 	{
 		if(config->getDeviceId() == DEVICE_KEYBOARD && input.value && input.id == SDLK_r && SDL_GetModState() & KMOD_LCTRL && Settings::getInstance()->getBool("Debug"))
 		{
-			LOG(LogInfo) << " Reloading SystemList view";
+			LOG(LogInfo) << "    Reloading SystemList view";
 
 			// reload themes
 			for(auto it = mEntries.begin(); it != mEntries.end(); it++)
@@ -171,11 +168,10 @@ void SystemView::onCursorChanged(const CursorState& state)
 		mSystemInfo.setOpacity((unsigned char)(lerp<float>(infoStartOpacity, 0.f, t) * 255));
 	}, (int)(infoStartOpacity * 150));
 
-	unsigned int gameCount = getSelected()->getGameCount();
-
 	// also change the text after we've fully faded out
-	setAnimation(infoFadeOut, 0, [this, gameCount] {
-		std::stringstream ss;
+	setAnimation(infoFadeOut, 0, [this] {
+		// get item count string
+		unsigned int gameCount = getSelected()->getGameCount(true);
 		
 		if (getSelected()->getName() == "retropie")
 			ss << "CONFIGURATION";
@@ -183,21 +179,17 @@ void SystemView::onCursorChanged(const CursorState& state)
 		else if(gameCount > 1)
 			ss << gameCount << " GAMES AVAILABLE";
 
-		mSystemInfo.setText(ss.str()); 
+		mSystemInfo.setText(ss.str());
 	}, false, 1);
 
-	// only display a game count if there are at least 2 games
-	if(gameCount > 1)
+	Animation* infoFadeIn = new LambdaAnimation(
+		[this](float t)
 	{
-		Animation* infoFadeIn = new LambdaAnimation(
-			[this](float t)
-		{
-			mSystemInfo.setOpacity((unsigned char)(lerp<float>(0.f, 1.f, t) * 255));
-		}, 300);
+		mSystemInfo.setOpacity((unsigned char)(lerp<float>(0.f, 1.f, t) * 255));
+	}, 300);
 
-		// wait 600ms to fade in
-		setAnimation(infoFadeIn, 2000, nullptr, false, 2);
-	}
+	// wait ms to fade in
+	setAnimation(infoFadeIn, 800, nullptr, false, 2);
 
 	// no need to animate transition, we're not going anywhere (probably mEntries.size() == 1)
 	if(endPos == mCamOffset && endPos == mExtrasCamOffset)

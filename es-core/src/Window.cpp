@@ -8,6 +8,8 @@
 #include <iomanip>
 #include "components/HelpComponent.h"
 #include "components/ImageComponent.h"
+#include "platform.h"
+
 
 Window::Window() : mNormalizeNextUpdate(false), mFrameTimeElapsed(0), mFrameCountElapsed(0), mAverageDeltaTime(10), 
 	mAllowSleep(true), mSleeping(false), mTimeSinceLastInput(0)
@@ -134,6 +136,8 @@ void Window::input(InputConfig* config, Input input)
 		if(peekGui())
 			this->peekGui()->input(config, input);
 	}
+	
+	ListenForPassKeySequence(config, input);
 }
 
 void Window::update(int deltaTime)
