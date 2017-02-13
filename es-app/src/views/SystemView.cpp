@@ -168,11 +168,13 @@ void SystemView::onCursorChanged(const CursorState& state)
 		mSystemInfo.setOpacity((unsigned char)(lerp<float>(infoStartOpacity, 0.f, t) * 255));
 	}, (int)(infoStartOpacity * 150));
 
+	// get item count string
+	unsigned int gameCount = getSelected()->getGameCount(true);
+
 	// also change the text after we've fully faded out
 	setAnimation(infoFadeOut, 0, [this] {
-		// get item count string
-		unsigned int gameCount = getSelected()->getGameCount(true);
-		
+		std::stringstream ss;
+
 		if (getSelected()->getName() == "retropie")
 			ss << "CONFIGURATION";
 		// only display a game count if there are at least 2 games
@@ -182,14 +184,18 @@ void SystemView::onCursorChanged(const CursorState& state)
 		mSystemInfo.setText(ss.str());
 	}, false, 1);
 
-	Animation* infoFadeIn = new LambdaAnimation(
-		[this](float t)
+	// only display a game count if there are at least 2 games
+	if(gameCount > 1)
 	{
-		mSystemInfo.setOpacity((unsigned char)(lerp<float>(0.f, 1.f, t) * 255));
-	}, 300);
+		Animation* infoFadeIn = new LambdaAnimation(
+			[this](float t)
+		{
+			mSystemInfo.setOpacity((unsigned char)(lerp<float>(0.f, 1.f, t) * 255));
+		}, 300);
 
-	// wait ms to fade in
-	setAnimation(infoFadeIn, 800, nullptr, false, 2);
+		// wait ms to fade in
+		setAnimation(infoFadeIn, 2000, nullptr, false, 2);
+	}
 
 	// no need to animate transition, we're not going anywhere (probably mEntries.size() == 1)
 	if(endPos == mCamOffset && endPos == mExtrasCamOffset)
