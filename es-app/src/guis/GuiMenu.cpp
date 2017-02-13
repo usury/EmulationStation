@@ -157,7 +157,7 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 			screensavers.push_back("black");
 			for(auto it = screensavers.begin(); it != screensavers.end(); it++)
 				screensaver_behavior->add(*it, *it, Settings::getInstance()->getString("ScreenSaverBehavior") == *it);
-			s->addWithLabel("SCREENSAVER TYPE", screensaver_behavior);
+			s->addWithLabel("SCREENSAVER BEHAVIOR", screensaver_behavior);
 			s->addSaveFunc([screensaver_behavior] { Settings::getInstance()->setString("ScreenSaverBehavior", screensaver_behavior->getSelected()); });
 
 			// framerate
@@ -219,9 +219,15 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 		});
 
 		addEntry("CONFIGURE INPUT", 0x777777FF, true, 
-			[this] { 
-				mWindow->pushGui(new GuiDetectDevice(mWindow, false, nullptr));
+			[this] {
+				Window* window = mWindow;
+				window->pushGui(new GuiMsgBox(window, "ARE YOU SURE YOU WANT TO CONFIGURE INPUT?", "YES",
+					[window] {
+						window->pushGui(new GuiDetectDevice(window, false, nullptr));
+					}, "NO", nullptr)
+				);
 		});
+
 		addEntry("OTHER SETTINGS", 0x777777FF, true,
 		[this] {
 			auto s = new GuiSettings(mWindow, "OTHER SETTINGS");
@@ -244,17 +250,9 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 			s->addSaveFunc([max_vram] { Settings::getInstance()->setInt("MaxVRAM", (int)round(max_vram->getValue())); });
 
 			mWindow->pushGui(s);
-	});
+		});
+	}
 
-	addEntry("CONFIGURE INPUT", 0x777777FF, true, 
-		[this] {
-			Window* window = mWindow;
-			window->pushGui(new GuiMsgBox(window, "ARE YOU SURE YOU WANT TO CONFIGURE INPUT?", "YES",
-				[window] {
-					window->pushGui(new GuiDetectDevice(window, false, nullptr));
-				}, "NO", nullptr)
-			);
-	});
 
 	addEntry("QUIT", 0x777777FF, true, 
 		[this] {
